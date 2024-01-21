@@ -1,38 +1,43 @@
 <?php
-// Check if form is submitted
+// Database connection parameters
+$servername = "your_server_name";
+$username_db = "your_db_username";
+$password_db = "your_db_password";
+$dbname = "your_database_name";
+
+// Create connection
+$conn = new mysqli($servername, $username_db, $password_db, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    // Retrieve credentials from the form
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    
-    // Your database connection code goes here
-    $servername = "your_server_name";
-    $username_db = "your_db_username";
-    $password_db = "your_db_password";
-    $dbname = "your_database_name";
+    // Retrieve data from the form
+    $newUsername = $_POST["new_username"];
+    $newPassword = $_POST["new_password"];
 
-    $conn = new mysqli($servername, $username_db, $password_db, $dbname);
+    // Use prepared statement to prevent SQL injection
+    $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+    $stmt->bind_param("ss", $newUsername, $newPassword);
 
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
+    // Execute the query
+    $stmt->execute();
 
-    // SQL query to check credentials
-    $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
-    $result = $conn->query($sql);
+    // Close the prepared statement
+    $stmt->close();
 
-    // If credentials are correct, redirect to another page
-    if ($result->num_rows > 0) {
-        header("Location: another_page.html");
-        exit();
+    // Optionally, you can check if the insertion was successful
+    if ($conn->affected_rows > 0) {
+        echo "Record inserted successfully.";
     } else {
-        // If credentials are incorrect, you may handle it accordingly (e.g., display an error message)
-        echo "Invalid credentials. Please try again.";
+        echo "Error inserting record: " . $conn->error;
     }
-
-    // Close the database connection
-    $conn->close();
 }
+
+// Close the database connection
+$conn->close();
 ?>
