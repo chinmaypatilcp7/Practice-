@@ -1,41 +1,29 @@
 <?php
 // Database connection parameters
-$servername = "your_server_name";
-$username_db = "your_db_username";
-$password_db = "your_db_password";
-$dbname = "your_database_name";
+$servername = "localhost"; // Replace with your database server name
+$username = "root"; // Replace with your database username
+$password = ""; // Replace with your database password
+$dbname = "users"; // Replace with your database name
 
 // Create connection
-$conn = new mysqli($servername, $username_db, $password_db, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // Retrieve data from the form
-    $newUsername = $_POST["new_username"];
-    $newPassword = $_POST["new_password"];
+// Example data to be inserted (replace these values with actual form data)
+$username = $_POST['username'];
+$password = $_POST['password'];
 
-    // Use prepared statement to prevent SQL injection
-    $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-    $stmt->bind_param("ss", $newUsername, $newPassword);
+// SQL query to insert data into the table (replace 'your_table_name' with your actual table name)
+$sql = "INSERT INTO your_table_name (username, password) VALUES ('$username', '$password')";
 
-    // Execute the query
-    $stmt->execute();
-
-    // Close the prepared statement
-    $stmt->close();
-
-    // Optionally, you can check if the insertion was successful
-    if ($conn->affected_rows > 0) {
-        echo "Record inserted successfully.";
-    } else {
-        echo "Error inserting record: " . $conn->error;
-    }
+if ($conn->query($sql) === TRUE) {
+    echo "New record created successfully";
+} else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
 }
 
 // Close the database connection
