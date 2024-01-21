@@ -1,31 +1,21 @@
 <?php
-$servername = "your_server_name";
-$username = "your_username";
-$password = "your_password";
-$dbname = "your_database_name";
+// Assuming you have a database connection established
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+// Assume $username and $password are obtained from user input
+$username = $_POST['username'];
+$password = $_POST['password'];
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Query the database to verify credentials
+$query = "SELECT * FROM users WHERE username='$username' AND password='$password'";
+$result = mysqli_query($connection, $query);
+
+if ($result && mysqli_num_rows($result) > 0) {
+    // User credentials are valid, open page1
+    header("Location: page1.php");
+    exit();
+} else {
+    // User credentials are invalid, open page2
+    header("Location: page2.php");
+    exit();
 }
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-
-    // Hash the password before comparing with the stored one
-    $hashed_password = hash('sha256', $password);
-
-    $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$hashed_password'";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        echo "verified";
-    } else {
-        echo "not_verified";
-    }
-}
-
-$conn->close();
 ?>
